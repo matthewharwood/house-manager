@@ -4,19 +4,18 @@
  * Self-hosted fonts. Files live in the source tree (not public/) so Vite
  * fingerprints them and rewrites url() against the GH Pages base path.
  *
- * Design language: black "HUD" — Monument Extended (display, Black 900,
- * UPPERCASE headings) + Inter (body) + JetBrains Mono (numerics). See RULES.md §11.
- * Monument Extended ships only the Black/900 cut; Inter & JetBrains Mono are
- * variable (one file covers every weight).
+ * Design language: black "HUD" — Archivo (display: wide + heavy, UPPERCASE
+ * headings) + Inter (body) + JetBrains Mono (numerics). See RULES.md §11. All
+ * three are variable (one woff2 covers every weight; Archivo also carries a
+ * width axis, which the headings push to expanded for the HUD wordmark look).
  */
 @font-face {
-  font-family: "Monument Extended";
+  font-family: "Archivo Variable";
   font-style: normal;
-  font-weight: 900;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
   font-display: swap;
-  src:
-    url("./fonts/monumentextended-black-webfont.woff2") format("woff2"),
-    url("./fonts/monumentextended-black-webfont.woff") format("woff");
+  src: url("./fonts/archivo-latin-standard-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -49,7 +48,7 @@
  */
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Monument Extended", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
   /* Elevation ramp (substrate → raised surfaces) */
@@ -93,7 +92,7 @@ body {
 }
 
 /* Headlines default to the display face, UPPERCASE — the HUD signature.
-   Opt out with `.heading-body` where Monument shouts louder than the content earns. */
+   Opt out with `.heading-body` where the display face shouts louder than the content earns. */
 @layer base {
   h1,
   h2,
@@ -102,8 +101,10 @@ body {
   h5,
   h6 {
     font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 125%;
     text-transform: uppercase;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.02em;
   }
 
   .heading-body,

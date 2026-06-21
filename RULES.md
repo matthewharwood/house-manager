@@ -275,11 +275,13 @@ HUD feel and the typographic system**, and **re-skin it to a black theme**. — 
 > and **Inter** in place of Archivo. Monument Extended and JetBrains Mono carry over.
 
 ### 11.1 Typography — [Decided]
-- **Display:** **Monument Extended** (only the **Black / 900** weight exists in the
-  source), used **UPPERCASE** for headings and the wordmark. Commercial (Pangram
-  Pangram) — **carry the files** from the source repo, do not re-download:
-  `engmanager-invoice/apps/web/public/fonts/monumentextended-black-webfont.{woff2,woff}`.
-- **Body / sans:** **Inter** (replaces Archivo). OFL — self-host fresh woff2.
+- **Display:** **Archivo** (variable; pushed to **expanded width + heavy weight**),
+  **UPPERCASE** for headings and the wordmark. OFL — self-hosted
+  (`archivo-latin-standard-normal.woff2`). NOTE: this was originally Monument
+  Extended, but that face is **commercial** (Pangram Pangram) and the repo is now
+  **public**, so it was swapped for Archivo — the wide, geometric family the source
+  app itself pairs with — to avoid redistributing a licensed font.
+- **Body / sans:** **Inter**. OFL — self-host fresh woff2.
 - **Mono / numerics:** **JetBrains Mono** (great for a HUD's numbers/tables). OFL —
   self-host.
 - Wire as Tailwind v4 `@theme` tokens: `--font-display` (Monument), `--font-sans`
