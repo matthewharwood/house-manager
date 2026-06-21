@@ -1,5 +1,6 @@
 import { devtools as tanstackDevtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type UserConfig } from "vite";
 
 import { sharedPlugins } from "./vite.shared";
@@ -100,6 +101,12 @@ export default defineConfig(async ({ mode }) => {
           failOnError: true,
         },
       }),
+      // React Refresh + JSX transform. TanStack Start's vite plugin stopped
+      // bundling React Refresh as of @tanstack/start-plugin-core ~1.171.x and
+      // now hard-requires a host-provided `/@react-refresh`; without this, the
+      // dev client entry 500s ("requires the React Refresh runtime"). Must stay
+      // AFTER tanstackStart and OUT of vite.shared (Storybook ships its own).
+      viteReact(),
     ],
   };
 });
