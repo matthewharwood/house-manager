@@ -3,7 +3,7 @@ import type { Progress, Settings } from "@house-manager/schemas";
 import { getDB } from "./db";
 import type { EntityRecord } from "./entity-schema";
 import type { StoreName } from "./hydration";
-import type { WorkspaceSelection } from "./workspace-schema";
+import type { Namespace, Org, WorkspaceSelection } from "./workspace-schema";
 
 const DEBOUNCE_MS = 150;
 // BroadcastChannel is origin-scoped too — namespace it like DB_NAME so apps
@@ -61,6 +61,38 @@ export function deleteEntity(id: string): void {
     const db = await getDB();
     await db.delete("entities", id);
     channel?.postMessage({ store: "entities", key: id });
+  });
+}
+
+export function persistOrg(value: Org): void {
+  schedule(`org:${value.id}`, async () => {
+    const db = await getDB();
+    await db.put("orgs", value);
+    channel?.postMessage({ store: "orgs", key: value.id });
+  });
+}
+
+export function deleteOrgRow(id: string): void {
+  schedule(`org:${id}`, async () => {
+    const db = await getDB();
+    await db.delete("orgs", id);
+    channel?.postMessage({ store: "orgs", key: id });
+  });
+}
+
+export function persistNamespace(value: Namespace): void {
+  schedule(`namespace:${value.id}`, async () => {
+    const db = await getDB();
+    await db.put("namespaces", value);
+    channel?.postMessage({ store: "namespaces", key: value.id });
+  });
+}
+
+export function deleteNamespaceRow(id: string): void {
+  schedule(`namespace:${id}`, async () => {
+    const db = await getDB();
+    await db.delete("namespaces", id);
+    channel?.postMessage({ store: "namespaces", key: id });
   });
 }
 
