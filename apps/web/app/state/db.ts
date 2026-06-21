@@ -2,6 +2,7 @@ import type { Progress, Settings } from "@house-manager/schemas";
 import { type DBSchema, type IDBPDatabase, openDB } from "idb";
 
 import type { EntityRecord } from "./entity-schema";
+import { SEED_RECIPES } from "./seed-data";
 import {
   type Namespace,
   type Org,
@@ -24,7 +25,7 @@ export interface AppDB extends DBSchema {
 // keyed by origin, so a bare "web" would collide whenever two house-manager
 // apps are served from the same origin (e.g. localhost:5173 across repos/apps).
 const DB_NAME = "@house-manager/web";
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 
 let dbPromise: Promise<IDBPDatabase<AppDB>> | undefined;
 let closed = false;
@@ -35,7 +36,7 @@ export function getDB(): Promise<IDBPDatabase<AppDB>> {
   }
   if (dbPromise) return dbPromise;
   dbPromise = openDB<AppDB>(DB_NAME, DB_VERSION, {
-    upgrade(db, oldVersion) {
+    upgrade(db, oldVersion, _newVersion, transaction) {
       // Cumulative migrations — every hop must run for users on older versions.
       // Equivalent to `switch(oldVersion)` with fall-through; the `<` form is
       // biome-clean and just as canonical.
@@ -60,6 +61,11 @@ export function getDB(): Promise<IDBPDatabase<AppDB>> {
         // One per-namespace domain store (id/type/namespaceId + payload). New
         // entity types reuse it — no further migrations needed.
         db.createObjectStore("entities", { keyPath: "id" });
+      }
+      if (oldVersion < 5) {
+        // Starter content — seed recipe(s) into the entities store.
+        const entities = transaction.objectStore("entities");
+        for (const recipe of SEED_RECIPES) void entities.put(recipe);
       }
     },
     blocked() {
