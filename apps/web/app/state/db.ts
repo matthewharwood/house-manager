@@ -1,16 +1,28 @@
 import type { Progress, Settings } from "@house-manager/schemas";
 import { type DBSchema, type IDBPDatabase, openDB } from "idb";
 
+import {
+  type Namespace,
+  type Org,
+  SEED_NAMESPACES,
+  SEED_ORGS,
+  SEED_SELECTION,
+  type WorkspaceSelection,
+} from "./workspace-schema";
+
 export interface AppDB extends DBSchema {
   progress: { key: string; value: Progress };
   settings: { key: string; value: Settings };
+  orgs: { key: string; value: Org };
+  namespaces: { key: string; value: Namespace };
+  workspace: { key: string; value: WorkspaceSelection };
 }
 
 // Namespaced by repo scope + app name (the package.json `name`). IndexedDB is
 // keyed by origin, so a bare "web" would collide whenever two house-manager
 // apps are served from the same origin (e.g. localhost:5173 across repos/apps).
 const DB_NAME = "@house-manager/web";
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbPromise: Promise<IDBPDatabase<AppDB>> | undefined;
 let closed = false;
@@ -31,6 +43,16 @@ export function getDB(): Promise<IDBPDatabase<AppDB>> {
       if (oldVersion < 2) {
         const settings = db.createObjectStore("settings", { keyPath: "id" });
         void settings.put({ id: "settings", theme: "light", reducedMotion: false });
+      }
+      if (oldVersion < 3) {
+        // Two-tier workspace (RULES.md §4.0): seed orgs + namespaces + the
+        // active selection so a fresh install opens straight into a household.
+        const orgs = db.createObjectStore("orgs", { keyPath: "id" });
+        for (const org of SEED_ORGS) void orgs.put(org);
+        const namespaces = db.createObjectStore("namespaces", { keyPath: "id" });
+        for (const ns of SEED_NAMESPACES) void namespaces.put(ns);
+        const workspace = db.createObjectStore("workspace", { keyPath: "id" });
+        void workspace.put(SEED_SELECTION);
       }
     },
     blocked() {

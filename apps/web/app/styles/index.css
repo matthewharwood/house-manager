@@ -1,74 +1,99 @@
 @import "tailwindcss";
 
 /*
- * Self-hosted brand fonts. Files live in the source tree (not public/) so Vite
- * fingerprints them and rewrites the url() against the GH Pages base path —
- * a public/ asset referenced as /fonts/* would 404 under a /<repo>/ base.
+ * Self-hosted fonts. Files live in the source tree (not public/) so Vite
+ * fingerprints them and rewrites url() against the GH Pages base path.
  *
- * PP Editorial Sans ships no Regular(400) weight, so Medium covers the 400–500
- * range and Ultrabold covers 600–800 — no synthetic faux-bold.
+ * Design language: black "HUD" — Monument Extended (display, Black 900,
+ * UPPERCASE headings) + Inter (body) + JetBrains Mono (numerics). See RULES.md §11.
+ * Monument Extended ships only the Black/900 cut; Inter & JetBrains Mono are
+ * variable (one file covers every weight).
  */
 @font-face {
-  font-family: "PP Editorial Sans";
+  font-family: "Monument Extended";
   font-style: normal;
-  font-weight: 400 500;
+  font-weight: 900;
   font-display: swap;
-  src: url("./fonts/PPEditorialSans-Medium.woff2") format("woff2");
+  src:
+    url("./fonts/monumentextended-black-webfont.woff2") format("woff2"),
+    url("./fonts/monumentextended-black-webfont.woff") format("woff");
 }
 
 @font-face {
-  font-family: "PP Editorial Sans";
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("./fonts/inter-latin-wght-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Variable";
   font-style: italic;
-  font-weight: 400 500;
+  font-weight: 100 900;
   font-display: swap;
-  src: url("./fonts/PPEditorialSans-MediumItalic.woff2") format("woff2");
+  src: url("./fonts/inter-latin-wght-italic.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: "PP Editorial Sans";
+  font-family: "JetBrains Mono Variable";
   font-style: normal;
-  font-weight: 600 800;
+  font-weight: 100 800;
   font-display: swap;
-  src: url("./fonts/PPEditorialSans-Ultrabold.woff2") format("woff2");
+  src: url("./fonts/jetbrains-mono-latin-wght-normal.woff2") format("woff2");
 }
 
-@font-face {
-  font-family: "PP Editorial Old";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("./fonts/PPEditorialOld-Regular.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "PP Editorial Old";
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url("./fonts/PPEditorialOld-Italic.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "PP Editorial Old";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("./fonts/PPEditorialOld-Bold.woff2") format("woff2");
-}
-
+/*
+ * Black HUD tokens. Dark elevation works by LIGHTNESS, not shadow (shadows wash
+ * out on black) — each surface step is a touch lighter than the one beneath it.
+ */
 @theme {
-  --color-brand-500: oklch(62% 0.20 260deg);
-  --color-brand-900: oklch(30% 0.10 260deg);
-  --font-sans: "PP Editorial Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "PP Editorial Old", ui-serif, "Georgia", serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --spacing: 0.25rem;
-  --radius-card: 1rem;
-  --breakpoint-3xl: 120rem;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Monument Extended", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  /* Elevation ramp (substrate → raised surfaces) */
+  --color-canvas: #08080a; /* app substrate */
+  --color-surface: #131316; /* inset cards: rail + main */
+  --color-raised: #1c1c21; /* menus, hover, sheets */
+  --color-overlay: #242429; /* drawers / sheets over a scrim */
+  --color-hairline: #2a2a31; /* borders / dividers */
+
+  /* Text */
+  --color-fg: #f4f4f5; /* primary */
+  --color-muted: #9a9aa3; /* secondary */
+  --color-faint: #6c6c76; /* tertiary / disabled */
+
+  /* Accent + status (carried from the source palette; legible on black) */
+  --color-accent: #328efa;
+  --color-accent-fg: #06080d;
+  --color-success: #47d096;
+  --color-warning: #fbc768;
+  --color-danger: #e16540;
+
+  /* Radii */
+  --radius-button: 0.5rem; /* 8px */
+  --radius-card: 0.75rem; /* 12px */
+  --radius-pill: 999px;
 }
 
-/* Headlines default to the display face; a `font-sans`/`font-mono` utility
-   still wins since utilities layer above base. */
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--color-canvas);
+  color: var(--color-fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Headlines default to the display face, UPPERCASE — the HUD signature.
+   Opt out with `.heading-body` where Monument shouts louder than the content earns. */
 @layer base {
   h1,
   h2,
@@ -77,7 +102,32 @@
   h5,
   h6 {
     font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+
+  .heading-body,
+  .heading-body :is(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-sans);
+    text-transform: none;
+    letter-spacing: normal;
+  }
+
+  /* Tabular numerics for the HUD's counts/times. */
+  .nums {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
   }
 }
 
-@custom-variant dark (&:where(.dark, .dark *));
+/* Honor the OS reduced-motion preference everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

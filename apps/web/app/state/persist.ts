@@ -2,6 +2,7 @@ import type { Progress, Settings } from "@house-manager/schemas";
 
 import { getDB } from "./db";
 import type { StoreName } from "./hydration";
+import type { WorkspaceSelection } from "./workspace-schema";
 
 const DEBOUNCE_MS = 150;
 // BroadcastChannel is origin-scoped too — namespace it like DB_NAME so apps
@@ -35,6 +36,14 @@ export function persistSettings(value: Settings): void {
     const db = await getDB();
     await db.put("settings", value);
     channel?.postMessage({ store: "settings", key: value.id });
+  });
+}
+
+export function persistWorkspace(value: WorkspaceSelection): void {
+  schedule(`workspace:${value.id}`, async () => {
+    const db = await getDB();
+    await db.put("workspace", value);
+    channel?.postMessage({ store: "workspace", key: value.id });
   });
 }
 

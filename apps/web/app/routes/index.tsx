@@ -1,19 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { HealthCard } from "~/components/health-card";
-import { env } from "~/env";
+import { PagePlaceholder } from "~/components/page-placeholder";
 import { buildSeoLinks } from "~/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({ links: buildSeoLinks({ path: "/" }) }),
-  component: Home,
+  component: Today,
 });
 
-function Home() {
+function Today() {
   return (
-    <main className="flex flex-col items-center gap-4 min-h-screen justify-center font-display">
-      <h1 className="text-3xl">{env.VITE_GAME_TITLE}</h1>
-      <HealthCard />
-    </main>
+    <PagePlaceholder
+      title="Today"
+      blurb="Your day at a glance — chores, meals, pickups, and who's on."
+    />
   );
 }

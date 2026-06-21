@@ -2,6 +2,7 @@ import { HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { Provider } from "jotai";
 import { lazy, type ReactNode, Suspense, use } from "react";
 
+import { AppShell } from "~/components/shell/app-shell";
 import { idbHydrationPromise } from "~/state/hydration";
 
 // The `<html>` shell + Pillar 3 hydration boundary, extracted out of
@@ -56,7 +57,9 @@ export function RootShell(): ReactNode {
         <Provider>
           <Suspense fallback={null}>
             <HydrateThenRender>
-              <Outlet />
+              <AppShell>
+                <Outlet />
+              </AppShell>
             </HydrateThenRender>
           </Suspense>
         </Provider>
