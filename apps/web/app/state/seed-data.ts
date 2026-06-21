@@ -1,8 +1,8 @@
 import type { EntityRecord } from "./entity-schema";
 
-// Starter content seeded by the v5 migration into the default "Main House"
-// namespace (ns-main). Extra recipe fields ride alongside the EntityRecord base;
-// they're validated by RecipeSchema on read.
+// Starter content seeded by migrations into the default "Main House" namespace
+// (ns-main). Extra recipe fields (structured ingredients, baseServings, …) ride
+// alongside the EntityRecord base and are validated by RecipeSchema on read.
 export const SEED_RECIPES: EntityRecord[] = [
   {
     id: "recipe-coconut-chia-oat-pudding",
@@ -13,17 +13,18 @@ export const SEED_RECIPES: EntityRecord[] = [
     title: "Coconut Chia Oat Pudding in a Jar",
     mealType: "breakfast",
     cadence: "Biweekly",
+    baseServings: 1,
     forWho: ["Matthew", "Daisy"],
     ingredients: [
-      "4 tbsp chia seeds",
-      "3 tbsp rolled oats",
-      "1 cup coconut milk",
-      "¼ cup regular milk, plus more if needed",
-      "1–2 tbsp honey, to taste",
-      "¼–½ tsp cinnamon",
-      "½ tsp vanilla extract",
-      "Tiny pinch of salt",
-    ].join("\n"),
+      { name: "Chia seeds", amount: 4, unit: "tbsp", section: "", note: "" },
+      { name: "Rolled oats", amount: 3, unit: "tbsp", section: "", note: "" },
+      { name: "Coconut milk", amount: 1, unit: "cup", section: "", note: "" },
+      { name: "Regular milk", amount: 0.25, unit: "cup", section: "", note: "plus more if needed" },
+      { name: "Honey", amount: 1, unit: "tbsp", section: "", note: "to taste" },
+      { name: "Cinnamon", amount: 0.25, unit: "tsp", section: "", note: "¼–½" },
+      { name: "Vanilla extract", amount: 0.5, unit: "tsp", section: "", note: "" },
+      { name: "Salt", amount: 0, unit: "", section: "", note: "tiny pinch" },
+    ],
     method: [
       "1. In your jar, add coconut milk, regular milk, honey, cinnamon, vanilla, and salt.",
       "2. Stir or shake until the honey is mixed in.",
@@ -41,6 +42,56 @@ export const SEED_RECIPES: EntityRecord[] = [
       "Tropical: mango, shredded coconut, a little lime zest.",
       "",
       "Texture: with 4 tbsp chia + oats it gets pretty thick. For creamier the next day, add another 2–4 tbsp milk and stir.",
+    ].join("\n"),
+  } as EntityRecord,
+  {
+    id: "recipe-kimchi-dill-egg-bowl",
+    type: "recipe",
+    namespaceId: "ns-main",
+    createdAt: "2026-06-21T08:05:00.000Z",
+    updatedAt: "2026-06-21T08:05:00.000Z",
+    title: "Kimchi Dill Egg Breakfast Bowl",
+    mealType: "breakfast",
+    cadence: "Every 3 days",
+    baseServings: 1,
+    forWho: ["Wife"],
+    ingredients: [
+      {
+        name: "Cooked wild rice / purple mixed rice",
+        amount: 100,
+        unit: "g",
+        section: "Rice + greens",
+        note: "",
+      },
+      { name: "Raw spinach", amount: 30, unit: "g", section: "Rice + greens", note: "" },
+      { name: "Hard-boiled egg, peeled", amount: 50, unit: "g", section: "Protein", note: "" },
+      { name: "Nonfat Greek yogurt", amount: 170, unit: "g", section: "Protein", note: "" },
+      { name: "Tomato", amount: 80, unit: "g", section: "Fresh crunch", note: "" },
+      { name: "Cucumber with peel", amount: 80, unit: "g", section: "Fresh crunch", note: "" },
+      { name: "Kimchi", amount: 18, unit: "g", section: "Fresh crunch", note: "" },
+      { name: "Avocado flesh", amount: 35, unit: "g", section: "Fat + texture", note: "" },
+      { name: "Olive oil", amount: 5, unit: "g", section: "Fat + texture", note: "" },
+      { name: "Ground flaxseed", amount: 8, unit: "g", section: "Fat + texture", note: "" },
+      { name: "Lemon juice", amount: 7, unit: "g", section: "Seasoning", note: "" },
+      { name: "Fresh dill", amount: 2, unit: "g", section: "Seasoning", note: "" },
+      { name: "Garlic powder", amount: 0.3, unit: "g", section: "Seasoning", note: "" },
+      { name: "Smoked paprika", amount: 0.5, unit: "g", section: "Seasoning", note: "" },
+      { name: "Black pepper", amount: 0.2, unit: "g", section: "Seasoning", note: "" },
+      { name: "Himalayan salt", amount: 0.5, unit: "g", section: "Seasoning", note: "" },
+    ],
+    method: [
+      "1. Warm 100g cooked rice.",
+      "2. Wilt 30g spinach, then mix it into the rice.",
+      "3. Mix the sauce: 170g yogurt, 8g flaxseed, 7g lemon juice, 2g dill, 0.3g garlic powder, 0.5g smoked paprika, 0.2g black pepper, and 0.5g salt.",
+      "4. Dice 80g tomato, 80g cucumber, 35g avocado, and 18g kimchi.",
+      "5. Add rice/spinach to the bowl.",
+      "6. Add tomato, cucumber, avocado, kimchi, and 50g hard-boiled egg.",
+      "7. Spoon the yogurt sauce over top.",
+      "8. Finish with 5g olive oil.",
+    ].join("\n"),
+    notes: [
+      "Cooking cadence: every 3 days.",
+      "Base recipe is one serving — use the servings counter to scale the ingredient amounts.",
     ].join("\n"),
   } as EntityRecord,
 ];

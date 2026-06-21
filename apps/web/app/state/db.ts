@@ -25,7 +25,7 @@ export interface AppDB extends DBSchema {
 // keyed by origin, so a bare "web" would collide whenever two house-manager
 // apps are served from the same origin (e.g. localhost:5173 across repos/apps).
 const DB_NAME = "@house-manager/web";
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 let dbPromise: Promise<IDBPDatabase<AppDB>> | undefined;
 let closed = false;
@@ -64,6 +64,12 @@ export function getDB(): Promise<IDBPDatabase<AppDB>> {
       }
       if (oldVersion < 5) {
         // Starter content — seed recipe(s) into the entities store.
+        const entities = transaction.objectStore("entities");
+        for (const recipe of SEED_RECIPES) void entities.put(recipe);
+      }
+      if (oldVersion < 6) {
+        // Recipes gained structured, scalable ingredients + a second recipe —
+        // re-seed (same ids overwrite the v5 string-ingredient versions).
         const entities = transaction.objectStore("entities");
         for (const recipe of SEED_RECIPES) void entities.put(recipe);
       }
