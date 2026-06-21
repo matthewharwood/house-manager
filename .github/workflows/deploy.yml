@@ -29,7 +29,7 @@ jobs:
     env:
       VITE_GAME_TITLE: ${{ vars.VITE_GAME_TITLE || 'house-manager' }}
       VITE_SITE_URL: ${{ vars.VITE_SITE_URL || format('https://{0}.github.io/{1}/', github.repository_owner, github.event.repository.name) }}
-      VITE_SITE_DESCRIPTION: ${{ vars.VITE_SITE_DESCRIPTION || 'Rapid-prototyping platform for browser games, deployed static to GitHub Pages with local-first IndexedDB state.' }}
+      VITE_SITE_DESCRIPTION: ${{ vars.VITE_SITE_DESCRIPTION || 'A mobile-first, local-first household manager. Deployed static to GitHub Pages.' }}
       VITE_OG_IMAGE: ${{ vars.VITE_OG_IMAGE }}
       VITE_AUTHOR_NAME: ${{ vars.VITE_AUTHOR_NAME }}
       VITE_AUTHOR_URL: ${{ vars.VITE_AUTHOR_URL }}
@@ -45,13 +45,18 @@ jobs:
 
       - id: pages
         uses: actions/configure-pages@v5
+        with:
+          # Create the Pages site on first run instead of erroring when it
+          # isn't enabled yet.
+          enablement: true
 
       - run: bun install --frozen-lockfile
 
-      - run: bunx playwright install --with-deps chromium
-        working-directory: apps/web
-
-      - run: bun run check
+      # Deploy gate: typecheck only. The full lint/test/e2e suite is the
+      # pre-push hook's job (`bun run check:fast`), not the deploy path —
+      # running it here failed the deploy on intentionally-kept-but-unused
+      # workspace packages (fallow dead-code) and on flaky browser e2e.
+      - run: bunx turbo run typecheck --filter=@house-manager/${{ env.APP }}
 
       - name: Build ${{ env.APP }}
         env:

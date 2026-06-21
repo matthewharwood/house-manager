@@ -1,6 +1,7 @@
 import type { Progress, Settings } from "@house-manager/schemas";
 
 import { getDB } from "./db";
+import type { EntityRecord } from "./entity-schema";
 import type { StoreName } from "./hydration";
 import type { WorkspaceSelection } from "./workspace-schema";
 
@@ -44,6 +45,22 @@ export function persistWorkspace(value: WorkspaceSelection): void {
     const db = await getDB();
     await db.put("workspace", value);
     channel?.postMessage({ store: "workspace", key: value.id });
+  });
+}
+
+export function persistEntity(value: EntityRecord): void {
+  schedule(`entity:${value.id}`, async () => {
+    const db = await getDB();
+    await db.put("entities", value);
+    channel?.postMessage({ store: "entities", key: value.id });
+  });
+}
+
+export function deleteEntity(id: string): void {
+  schedule(`entity:${id}`, async () => {
+    const db = await getDB();
+    await db.delete("entities", id);
+    channel?.postMessage({ store: "entities", key: id });
   });
 }
 

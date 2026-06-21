@@ -1,6 +1,7 @@
 import type { Progress, Settings } from "@house-manager/schemas";
 import { type DBSchema, type IDBPDatabase, openDB } from "idb";
 
+import type { EntityRecord } from "./entity-schema";
 import {
   type Namespace,
   type Org,
@@ -16,13 +17,14 @@ export interface AppDB extends DBSchema {
   orgs: { key: string; value: Org };
   namespaces: { key: string; value: Namespace };
   workspace: { key: string; value: WorkspaceSelection };
+  entities: { key: string; value: EntityRecord };
 }
 
 // Namespaced by repo scope + app name (the package.json `name`). IndexedDB is
 // keyed by origin, so a bare "web" would collide whenever two house-manager
 // apps are served from the same origin (e.g. localhost:5173 across repos/apps).
 const DB_NAME = "@house-manager/web";
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 let dbPromise: Promise<IDBPDatabase<AppDB>> | undefined;
 let closed = false;
@@ -53,6 +55,11 @@ export function getDB(): Promise<IDBPDatabase<AppDB>> {
         for (const ns of SEED_NAMESPACES) void namespaces.put(ns);
         const workspace = db.createObjectStore("workspace", { keyPath: "id" });
         void workspace.put(SEED_SELECTION);
+      }
+      if (oldVersion < 4) {
+        // One per-namespace domain store (id/type/namespaceId + payload). New
+        // entity types reuse it — no further migrations needed.
+        db.createObjectStore("entities", { keyPath: "id" });
       }
     },
     blocked() {

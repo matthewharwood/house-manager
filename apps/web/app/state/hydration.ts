@@ -7,6 +7,7 @@ import {
 } from "@house-manager/schemas";
 
 import { getDB } from "./db";
+import type { EntityRecord } from "./entity-schema";
 import {
   type Namespace,
   NamespaceSchema,
@@ -25,6 +26,7 @@ export type HydratedState = {
   orgs: ReadonlyMap<string, Org>;
   namespaces: ReadonlyMap<string, Namespace>;
   workspace: WorkspaceSelection;
+  entities: ReadonlyMap<string, EntityRecord>;
 };
 
 // Seed maps reused for the SSR / no-IDB defaults, so a prerendered shell shows
@@ -51,18 +53,21 @@ export const idbHydrationPromise: Promise<HydratedState> = (async () => {
       orgs: seedOrgs(),
       namespaces: seedNamespaces(),
       workspace: SEED_SELECTION,
+      entities: new Map(),
     };
     resolvedSnapshot = empty;
     return empty;
   }
   const db = await getDB();
-  const [rawProgress, rawSettings, rawOrgs, rawNamespaces, rawWorkspace] = await Promise.all([
-    db.getAll("progress"),
-    db.get("settings", "settings"),
-    db.getAll("orgs"),
-    db.getAll("namespaces"),
-    db.get("workspace", "workspace"),
-  ]);
+  const [rawProgress, rawSettings, rawOrgs, rawNamespaces, rawWorkspace, rawEntities] =
+    await Promise.all([
+      db.getAll("progress"),
+      db.get("settings", "settings"),
+      db.getAll("orgs"),
+      db.getAll("namespaces"),
+      db.get("workspace", "workspace"),
+      db.getAll("entities"),
+    ]);
   const progress = new Map<string, Progress>();
   for (const raw of rawProgress) {
     const parsed = ProgressSchema.safeParse(raw);
@@ -86,7 +91,16 @@ export const idbHydrationPromise: Promise<HydratedState> = (async () => {
 
   const workspace = WorkspaceSelectionSchema.parse(rawWorkspace ?? SEED_SELECTION);
 
-  const snapshot: HydratedState = { progress, settings, orgs, namespaces, workspace };
+  const entities = new Map<string, EntityRecord>(rawEntities.map((record) => [record.id, record]));
+
+  const snapshot: HydratedState = {
+    progress,
+    settings,
+    orgs,
+    namespaces,
+    workspace,
+    entities,
+  };
   resolvedSnapshot = snapshot;
   return snapshot;
 })();
