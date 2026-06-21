@@ -21,7 +21,7 @@ export function MobileTopBar() {
       >
         <Menu className="size-5" aria-hidden />
       </button>
-      <WorkspaceSwitcher kind="namespace" variant="chip" />
+      <WorkspaceSwitcher variant="chip" />
     </header>
   );
 }

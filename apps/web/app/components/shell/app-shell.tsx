@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { MobileDrawer } from "./mobile-drawer";
 import { MobileTabBar } from "./mobile-tab-bar";
 import { MobileTopBar } from "./mobile-top-bar";
+import { SettingsModal } from "./settings-modal";
 import { Sidebar } from "./sidebar";
 
 // The windowed-canvas HUD shell. Desktop (≥ md): a dark substrate framing two
@@ -21,6 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <MobileTabBar />
       </div>
       <MobileDrawer />
+      <SettingsModal />
     </div>
   );
 }

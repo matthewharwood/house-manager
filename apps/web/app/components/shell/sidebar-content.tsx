@@ -1,7 +1,10 @@
 import { Link } from "@tanstack/react-router";
+import { useSetAtom } from "jotai";
+import { Settings } from "lucide-react";
 
 import { Logo } from "./logo";
 import { NAV_ITEMS } from "./nav";
+import { drawerOpenAtom, settingsOpenAtom } from "./shell-state";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 
 interface SidebarContentProps {
@@ -11,9 +14,9 @@ interface SidebarContentProps {
 }
 
 // The single source of the shell's information architecture, top → bottom:
-// NAMESPACE switcher · primary nav · ORG switcher. Used verbatim by both the
-// desktop rail and the mobile drawer so the two read as the same product
-// (RULES.md §4.0, §11.5).
+// NAMESPACE switcher · primary nav · SETTINGS button (org switching lives in
+// settings). Used verbatim by both the desktop rail and the mobile drawer so the
+// two read as the same product (RULES.md §4.0, §11.5).
 export function SidebarContent({
   collapsed = false,
   onNavigate,
@@ -24,7 +27,7 @@ export function SidebarContent({
       {/* TOP — logo + namespace switcher */}
       <div className={`flex flex-col gap-3 p-3 ${collapsed ? "items-center" : ""}`}>
         <Logo withWordmark={!collapsed} />
-        <WorkspaceSwitcher kind="namespace" collapsed={collapsed} />
+        <WorkspaceSwitcher collapsed={collapsed} />
       </div>
 
       {/* MIDDLE — primary navigation */}
@@ -56,10 +59,31 @@ export function SidebarContent({
         })}
       </nav>
 
-      {/* BOTTOM — org switcher */}
+      {/* BOTTOM — settings (org switching lives inside) */}
       <div className="border-t border-hairline p-3">
-        <WorkspaceSwitcher kind="org" collapsed={collapsed} />
+        <SettingsButton collapsed={collapsed} />
       </div>
     </div>
+  );
+}
+
+function SettingsButton({ collapsed }: { collapsed: boolean }) {
+  const openSettings = useSetAtom(settingsOpenAtom);
+  const setDrawerOpen = useSetAtom(drawerOpenAtom);
+  return (
+    <button
+      type="button"
+      title={collapsed ? "Settings" : undefined}
+      onClick={() => {
+        setDrawerOpen(false);
+        openSettings(true);
+      }}
+      className={`flex w-full items-center gap-2.5 rounded-button text-muted transition-colors hover:bg-raised hover:text-fg ${
+        collapsed ? "justify-center p-2" : "px-2.5 py-2"
+      }`}
+    >
+      <Settings className="size-5 shrink-0" aria-hidden />
+      {collapsed ? null : <span className="text-sm">Settings</span>}
+    </button>
   );
 }

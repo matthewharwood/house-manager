@@ -103,7 +103,9 @@ namespace**, not a specific person — see §3.)
 **4.0 Two tiers: Org → Namespace — [Decided]**
 The tenant splits into two levels: an **Org owns many Namespaces.**
 - **Org** = the top-level account (a household/family, or a set of houses you help
-  run). The **Org switcher lives at the BOTTOM of the side navigation.**
+  run). **Org selection lives in Settings** — a Settings button at the bottom of
+  the side navigation opens it. It's a low-frequency switch, kept out of the way;
+  selecting an org resets the active namespace and re-scopes every view.
 - **Namespace** = a scope inside an org (typically a house/home, or a context).
   The **Namespace switcher lives at the TOP-LEFT of the side navigation.**
 - All owned data is namespaced by **`namespaceId`** (transitively its `orgId`).
@@ -327,7 +329,8 @@ Recreate, in our stack, the source's shell:
 - **Left rail** (tablet/desktop): **collapsible** (~64px collapsed ↔ ~256px
   expanded). **Top = logo + NAMESPACE switcher (top-left, §4.0)**; **middle =
   icon + label nav items** (active = subtle surface fill + accent icon + medium
-  weight; inactive = muted + hover); **bottom = ORG switcher (§4.0)**. — [Decided]
+  weight; inactive = muted + hover); **bottom = Settings button** (opens org
+  switching, §4.0). — [Decided]
 - **Top bar** = section/breadcrumb selector + the rail **collapse toggle**. — [Decided]
 - **Mobile-first inversion.** The source is desktop-first (rail primary, hidden
   below `sm`). **We are mobile-first**, so the **mobile navigation is primary** — a
