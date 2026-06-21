@@ -1,0 +1,4 @@
+{
+  "extends": "@house-manager/tsconfig/base.json",
+  "include": ["src/**/*"]
+}

@@ -1,0 +1,7 @@
+{
+  "extends": "@house-manager/tsconfig/base.json",
+  "compilerOptions": {
+    "types": ["bun"]
+  },
+  "include": ["src/**/*"]
+}
