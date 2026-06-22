@@ -49,7 +49,7 @@ export function SidebarContent({
               }`}
             >
               <Icon
-                className="size-[18px] shrink-0 group-data-[status=active]:text-accent"
+                className="size-4.5 shrink-0 group-data-[status=active]:text-accent"
                 strokeWidth={1.75}
                 aria-hidden
               />

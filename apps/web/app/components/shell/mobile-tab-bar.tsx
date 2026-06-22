@@ -22,7 +22,7 @@ export function MobileTabBar() {
             key={item.id}
             to={item.href}
             activeOptions={{ exact: item.href === "/" }}
-            className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] text-muted transition-colors data-[status=active]:text-accent"
+            className="flex flex-col items-center justify-center gap-1 py-2 text-2xs text-muted transition-colors data-[status=active]:text-accent"
           >
             <Icon className="size-5" strokeWidth={1.75} aria-hidden />
             <span className="truncate">{item.label}</span>
@@ -32,7 +32,7 @@ export function MobileTabBar() {
       <button
         type="button"
         onClick={() => setDrawerOpen(true)}
-        className="flex flex-col items-center justify-center gap-1 py-2 text-[11px] text-muted transition-colors hover:text-fg"
+        className="flex flex-col items-center justify-center gap-1 py-2 text-2xs text-muted transition-colors hover:text-fg"
       >
         <MoreHorizontal className="size-5" aria-hidden />
         <span>More</span>

@@ -121,7 +121,7 @@ function ProgressRing({ done, total }: { done: number; total: number }) {
           className="stroke-accent"
         />
       </svg>
-      <span className="nums absolute text-[10px] text-fg">{pct}%</span>
+      <span className="nums absolute text-2xs text-fg">{pct}%</span>
     </div>
   );
 }

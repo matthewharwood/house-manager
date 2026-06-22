@@ -11,6 +11,13 @@ import { RootShell } from "~/lib/root-shell";
 import { NotFound, RouteError } from "~/lib/route-boundaries";
 import { buildJsonLd, buildSeoMeta } from "~/lib/seo";
 
+// Critical first-paint CSS, emitted into <head> via HeadContent (the route head
+// `styles` channel — NOT inline element styles). Mirrors the --color-canvas /
+// --color-fg tokens in styles/index.css so the dark theme paints on the first
+// frame, before the external (prod) / Vite JS-injected (dev) stylesheet loads.
+const CRITICAL_CSS =
+  "html{background:#08080a;color-scheme:dark}body{margin:0;background:#08080a;color:#f4f4f5}";
+
 // This file is route config only — components live in ~/lib/root-shell and
 // ~/lib/route-boundaries. react-doctor's `only-export-components` rule treats
 // any mix of component + non-component exports (or any local component
@@ -43,6 +50,7 @@ export const Route = createRootRoute({
         children: JSON.stringify(buildJsonLd()),
       },
     ],
+    styles: [{ children: CRITICAL_CSS }],
   }),
   component: RootShell,
   errorComponent: RouteError,

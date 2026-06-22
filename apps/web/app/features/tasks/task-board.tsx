@@ -149,7 +149,7 @@ export function OccurrenceRow({ occurrence }: { occurrence: Occurrence }) {
         aria-checked={occurrence.done}
         aria-label={occurrence.done ? "Mark not done" : "Mark done"}
         onClick={toggle}
-        className={`grid size-6 shrink-0 place-items-center rounded-[7px] border-2 transition-colors ${
+        className={`grid size-6 shrink-0 place-items-center rounded-sm border-2 transition-colors ${
           occurrence.done
             ? "border-accent bg-accent text-accent-fg"
             : "border-hairline text-transparent hover:border-accent"
@@ -200,7 +200,7 @@ function WeekView({
             className="flex items-start gap-3 rounded-card border border-hairline bg-surface p-3 text-left transition-colors hover:bg-raised"
           >
             <div className="w-12 shrink-0 text-center">
-              <div className="text-[10px] uppercase text-faint">
+              <div className="text-2xs uppercase text-faint">
                 {(WEEKDAY_NAMES[weekdayOf(day)] ?? "").slice(0, 3)}
               </div>
               <div className="nums text-lg text-fg">{parseIso(day).getDate()}</div>
@@ -251,7 +251,7 @@ function MonthView({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="grid grid-cols-7 gap-1 text-center text-[10px] uppercase text-faint">
+      <div className="grid grid-cols-7 gap-1 text-center text-2xs uppercase text-faint">
         {WEEKDAY_NAMES.map((name) => (
           <span key={name}>{name.charAt(0)}</span>
         ))}
@@ -268,7 +268,7 @@ function MonthView({
               key={day}
               type="button"
               onClick={() => onPick(day)}
-              className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-[8px] border text-xs transition-colors hover:bg-raised ${
+              className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-button border text-xs transition-colors hover:bg-raised ${
                 isToday ? "border-accent" : "border-hairline"
               }`}
             >

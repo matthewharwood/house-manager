@@ -3,7 +3,7 @@
 export function PagePlaceholder({ title, blurb }: { title: string; blurb?: string }) {
   return (
     <section className="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center gap-3 text-center">
-      <span className="rounded-pill border border-hairline bg-raised px-3 py-1 text-[11px] uppercase tracking-wide text-muted">
+      <span className="rounded-pill border border-hairline bg-raised px-3 py-1 text-2xs uppercase tracking-wide text-muted">
         Scaffold
       </span>
       <h1 className="text-3xl text-fg">{title}</h1>

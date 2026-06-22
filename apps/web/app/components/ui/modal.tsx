@@ -30,7 +30,7 @@ export function Modal({ open, onClose, title, children, footer }: ModalProps) {
         if (event.target === ref.current) onClose();
       }}
       aria-label={title}
-      className="m-auto w-full max-w-md rounded-card border border-hairline bg-overlay p-0 text-fg max-sm:mt-auto max-sm:mb-0 max-sm:max-w-none max-sm:rounded-b-none [&::backdrop]:bg-black/60 [&::backdrop]:backdrop-blur-sm"
+      className="m-auto w-full max-w-md rounded-card border border-hairline bg-overlay p-0 text-fg max-sm:mt-auto max-sm:mb-0 max-sm:max-w-none max-sm:rounded-b-none [&::backdrop]:bg-scrim [&::backdrop]:backdrop-blur-sm"
     >
       <div className="flex max-h-[85dvh] flex-col">
         <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-3">

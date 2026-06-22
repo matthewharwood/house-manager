@@ -43,13 +43,23 @@
 }
 
 /*
- * Black HUD tokens. Dark elevation works by LIGHTNESS, not shadow (shadows wash
- * out on black) — each surface step is a touch lighter than the one beneath it.
+ * Black HUD design tokens (Tailwind v4 @theme). This is the single source of
+ * truth for color, type, spacing-scale extensions, radii, elevation, and the
+ * scrim. Components must use the generated utilities (bg-surface, text-2xs,
+ * rounded-md, rounded-card, …) — NO arbitrary values or inline hex. Tailwind's
+ * built-in --spacing / --text-* / --breakpoint-* scales cover the rest.
+ *
+ * Elevation is by LIGHTNESS (each surface a touch lighter than the one beneath
+ * it) + hairline borders — NOT shadows, which are invisible on true-black.
  */
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Archivo Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  /* Type scale — extends Tailwind's xs–9xl with a micro size for HUD labels. */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
 
   /* Elevation ramp (substrate → raised surfaces) */
   --color-canvas: #08080a; /* app substrate */
@@ -70,10 +80,19 @@
   --color-warning: #fbc768;
   --color-danger: #e16540;
 
+  /* Scrim behind modal surfaces (dialog ::backdrop). */
+  --color-scrim: rgb(0 0 0 / 60%);
+
   /* Radii */
+  --radius-sm: 0.375rem; /* 6px — checkboxes, chips, small controls */
   --radius-button: 0.5rem; /* 8px */
-  --radius-card: 0.75rem; /* 12px */
+  --radius-md: 0.625rem; /* 10px — logo tile, medium controls */
+  --radius-card: 0.75rem; /* 12px — cards, sheets */
   --radius-pill: 999px;
+
+  /* No box-shadow tokens by design: on a true-black canvas a shadow is invisible.
+     Elevation is by surface LIGHTNESS + hairline borders; surfaces that float over
+     a scrim pop via --color-scrim above. */
 }
 
 :root {
@@ -118,6 +137,22 @@ body {
   .nums {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
+  }
+
+  /* Brand wordmark — the display face, expanded + uppercase (a logo, not a heading). */
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-stretch: 125%;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* One consistent keyboard-focus ring for every interactive element.
+     :where() keeps specificity at 0 so component styles still win. */
+  :where(a, button, input, select, textarea, summary, [role="checkbox"], [tabindex]):focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
   }
 }
 

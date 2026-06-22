@@ -196,7 +196,7 @@ function CheckButton({
       aria-checked={checked}
       aria-label={label}
       onClick={onClick}
-      className={`mt-0.5 grid size-4 shrink-0 place-items-center rounded-[5px] border transition-colors ${
+      className={`mt-0.5 grid size-4 shrink-0 place-items-center rounded-sm border transition-colors ${
         checked
           ? "border-accent bg-accent text-accent-fg"
           : "border-hairline text-transparent hover:border-accent"

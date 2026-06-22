@@ -293,33 +293,37 @@ HUD feel and the typographic system**, and **re-skin it to a black theme**. — 
   remove `apps/web/app/styles/fonts/PPEditorial*` and its `@font-face`/`@theme`
   block; replace with the three above. — [Decided]
 
-### 11.2 Theme — black re-skin — [Decided structure / Open exact values]
-Self-host nothing about color — it's all Tailwind v4 `@theme` tokens in
-`apps/web/app/styles/index.css`. Keep the source's **token structure** (named
-neutrals + status accents + `--radius-card: 12px` / `--radius-button: 8px`), but
-**invert to dark**. Proposed starting palette (tune later):
-```
-@theme {
-  --color-canvas:    #0a0a0b;  /* body substrate (was canvas-white) */
-  --color-surface:   #141416;  /* the "lifted" card / rail surface  */
-  --color-raised:    #1e1e21;  /* elevated panels, menus            */
-  --color-hairline:  rgba(255,255,255,0.08); /* borders/dividers    */
-  --color-text:      #f4f3ef;  /* primary text (was midnight-ink)   */
-  --color-text-muted:#9b9a98;  /* muted (was muted-ash)             */
-  --color-primary:   #fafafa;  /* primary action flips to near-white on black */
-  /* status / accent — survive on black, keep from source */
-  --color-accent-blue:  #328efa;  /* active-nav / focus accent */
-  --color-accent-gold:  #fbc768;
-  --color-accent-red:   #e16540;
-  --color-accent-green: #47d096;
-  --radius-card: 12px;
-  --radius-button: 8px;
-}
-```
-- **Active nav / focus accent = `#328efa`** (the source's intelligence-blue) — it
-  reads well on black. — [Decided]
-- Honor `prefers-reduced-motion` (the source does); keep the animated gradient logo
-  mark but freeze it under reduced-motion. — [Decided]
+### 11.2 Design tokens — black HUD — [Decided / Implemented]
+Everything visual is a Tailwind v4 `@theme` token in `apps/web/app/styles/index.css`
+— the single source of truth. **All UI uses the generated utilities. No arbitrary
+values (`text-[10px]`, `rounded-[6px]`), no inline hex, no inline element styles.**
+Tailwind v4's built-in scales (`--spacing`, `--text-*` with line-heights,
+`--breakpoint-*`) are themselves tokens — use them for spacing / sizing / grid.
+
+Tokens we define on top of Tailwind's defaults:
+- **Color (elevation ramp):** `--color-canvas #08080a` → `--color-surface` →
+  `--color-raised` → `--color-overlay` → `--color-hairline`. Each step a touch
+  lighter — elevation is by **LIGHTNESS + hairline borders, not shadow** (a shadow
+  is invisible on true-black; the source's `--shadow-*` tokens are for its LIGHT
+  theme and were intentionally dropped).
+- **Text:** `--color-fg` / `--color-muted` / `--color-faint`.
+- **Accent + status:** `--color-accent #328efa` (active-nav / focus — reads well on
+  black), `--color-accent-fg`, `--color-success` / `--color-warning` / `--color-danger`.
+- **Scrim:** `--color-scrim` for dialog `::backdrop` (replaces ad-hoc `bg-black/60`).
+- **Type:** `--text-2xs` (micro HUD labels) extends Tailwind's `xs`–`9xl`.
+- **Radii:** `--radius-sm 6px` / `--radius-button 8px` / `--radius-md 10px` /
+  `--radius-card 12px` / `--radius-pill`.
+- **Fonts:** `--font-display` (Archivo — expanded + UPPERCASE headings via `@layer
+  base`, plus the `.wordmark` logo utility), `--font-sans` (Inter), `--font-mono`
+  (JetBrains, via `.nums`).
+
+The base layer also gives every interactive element one accent `:focus-visible`
+outline, and honors `prefers-reduced-motion`. — [Decided]
+
+**First-paint critical CSS** is emitted as a real `<style>` in `<head>` via the root
+route's `head().styles` channel (`app/routes/__root.tsx` → `CRITICAL_CSS`), mirroring
+`--color-canvas` / `--color-fg` so the dark theme paints on frame 1 with no flash —
+NOT as inline `style=` on `<html>`/`<body>`. — [Decided]
 
 ### 11.3 App shell — the "windowed-canvas HUD" — [Decided structure]
 Recreate, in our stack, the source's shell:

@@ -27,7 +27,7 @@ export function MobileDrawer() {
         if (event.target === ref.current) setOpen(false);
       }}
       aria-label="Navigation"
-      className="m-0 mr-auto h-dvh max-h-dvh w-[86vw] max-w-80 border-r border-hairline bg-surface p-0 text-fg md:hidden [&::backdrop]:bg-black/60 [&::backdrop]:backdrop-blur-sm"
+      className="m-0 mr-auto h-dvh max-h-dvh w-[86vw] max-w-80 border-r border-hairline bg-surface p-0 text-fg md:hidden [&::backdrop]:bg-scrim [&::backdrop]:backdrop-blur-sm"
     >
       <SidebarContent onNavigate={() => setOpen(false)} className="h-dvh" />
     </dialog>

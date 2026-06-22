@@ -43,7 +43,7 @@ export function WorkspaceSwitcher({
         >
           <span
             aria-hidden
-            className="grid size-5 shrink-0 place-items-center rounded-[6px] bg-accent font-display text-[10px] text-accent-fg"
+            className="grid size-5 shrink-0 place-items-center rounded-sm bg-accent font-display text-2xs text-accent-fg"
           >
             {initial}
           </span>
@@ -62,14 +62,14 @@ export function WorkspaceSwitcher({
         >
           <span
             aria-hidden
-            className="grid size-8 shrink-0 place-items-center rounded-[8px] bg-accent font-display text-xs text-accent-fg"
+            className="grid size-8 shrink-0 place-items-center rounded-button bg-accent font-display text-xs text-accent-fg"
           >
             {initial}
           </span>
           {collapsed ? null : (
             <>
               <span className="min-w-0 flex-1">
-                <span className="block text-[10px] font-medium uppercase tracking-wide text-faint">
+                <span className="block text-2xs font-medium uppercase tracking-wide text-faint">
                   Namespace
                 </span>
                 <span className="block truncate text-sm text-fg">{active?.name}</span>

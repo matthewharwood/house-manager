@@ -43,7 +43,7 @@ export function PhaseSlider({ phase, onChange, disabled = false }: PhaseSliderPr
         {HIRING_PHASES.map((label, index) => (
           <span
             key={label}
-            className={`text-[10px] ${index === phase ? "font-medium text-accent" : "text-faint"}`}
+            className={`text-2xs ${index === phase ? "font-medium text-accent" : "text-faint"}`}
           >
             {label}
           </span>
