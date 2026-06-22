@@ -45,6 +45,9 @@ export const recipes = defineCollection("recipe", RecipeSchema);
 
 // Forgiving parser for the add-recipe form: "100g cooked rice" / "2 tbsp honey" /
 // "Tiny pinch of salt" (no leading number → unquantified). One ingredient/line.
+// Hoisted per biome useTopLevelRegex — a letters-only unit token ("g", "tbsp").
+const UNIT_TOKEN = /^[a-z]+$/i;
+
 function isDigit(char: string): boolean {
   return char >= "0" && char <= "9";
 }
@@ -66,7 +69,7 @@ export function parseIngredientLine(line: string): RecipeIngredient {
   // A leading letters-only token after the number is the unit; the rest is name.
   const rest = trimmed.slice(index).trim();
   const spaceAt = rest.indexOf(" ");
-  if (spaceAt > 0 && /^[a-z]+$/i.test(rest.slice(0, spaceAt))) {
+  if (spaceAt > 0 && UNIT_TOKEN.test(rest.slice(0, spaceAt))) {
     return {
       name: rest.slice(spaceAt + 1).trim(),
       amount,

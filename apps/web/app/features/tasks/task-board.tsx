@@ -16,7 +16,6 @@ import {
   startOfMonth,
   startOfWeek,
   todayIso,
-  WEEKDAY_INITIALS,
   WEEKDAY_NAMES,
   weekdayOf,
 } from "~/lib/date";
@@ -143,6 +142,7 @@ export function OccurrenceRow({ occurrence }: { occurrence: Occurrence }) {
 
   return (
     <div className="flex items-center gap-3 rounded-card border border-hairline bg-surface p-3">
+      {/* biome-ignore lint/a11y/useSemanticElements: custom-styled toggle; a native checkbox can't carry the HUD styling. */}
       <button
         type="button"
         role="checkbox"
@@ -252,8 +252,8 @@ function MonthView({
   return (
     <div className="flex flex-col gap-2">
       <div className="grid grid-cols-7 gap-1 text-center text-[10px] uppercase text-faint">
-        {WEEKDAY_INITIALS.map((initial, index) => (
-          <span key={`wd-${index}`}>{initial}</span>
+        {WEEKDAY_NAMES.map((name) => (
+          <span key={name}>{name.charAt(0)}</span>
         ))}
       </div>
       <div className="grid grid-cols-7 gap-1">
@@ -316,10 +316,7 @@ function TaskModal({ area, onClose }: { area: TaskArea; onClose: () => void }) {
                 area,
                 title: draft.title.trim(),
                 cadence: draft.cadence as Task["cadence"],
-                weekday: Math.max(
-                  0,
-                  WEEKDAY_NAMES.findIndex((name) => name === draft.weekday),
-                ),
+                weekday: Math.max(0, (WEEKDAY_NAMES as readonly string[]).indexOf(draft.weekday)),
                 dueDate: draft.cadence === "once" ? draft.dueDate : "",
                 rotation: draft.rotation
                   .split(",")

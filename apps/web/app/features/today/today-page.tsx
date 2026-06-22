@@ -102,7 +102,12 @@ function ProgressRing({ done, total }: { done: number; total: number }) {
   const pct = total === 0 ? 0 : Math.round((done / total) * 100);
   return (
     <div className="relative grid size-12 shrink-0 place-items-center">
-      <svg viewBox="0 0 36 36" className="size-12 -rotate-90" aria-hidden>
+      <svg
+        viewBox="0 0 36 36"
+        className="size-12 -rotate-90"
+        role="img"
+        aria-label={`${pct}% done`}
+      >
         <circle cx="18" cy="18" r="15.5" fill="none" strokeWidth="3" className="stroke-hairline" />
         <circle
           cx="18"

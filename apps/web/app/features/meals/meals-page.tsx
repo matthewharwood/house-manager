@@ -1,5 +1,5 @@
 import { useAtomValue, useSetAtom } from "jotai";
-import { ChevronDown, Minus, Plus } from "lucide-react";
+import { Check, ChevronDown, ListChecks, Minus, Plus } from "lucide-react";
 import { useState } from "react";
 
 import { SelectField, TextArea, TextField } from "~/components/ui/field";
@@ -24,6 +24,13 @@ function formatAmount(ingredient: RecipeIngredient, factor: number): string {
   if (ingredient.amount <= 0) return "";
   const value = Math.round(ingredient.amount * factor * 100) / 100;
   return ingredient.unit ? `${value} ${ingredient.unit}` : `${value}`;
+}
+
+function splitSteps(method: string): string[] {
+  return method
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
 }
 
 // Meals as a recipe library, categorized by meal type (RULES.md §6).
@@ -76,7 +83,22 @@ export function MealsPage() {
 function RecipeCard({ recipe }: { recipe: Recipe }) {
   const [open, setOpen] = useState(false);
   const [servings, setServings] = useState(recipe.baseServings);
+  // Opt-in "cook mode": off by default so the read view stays clean; on, it
+  // turns ingredients + steps into a tickable checklist. Ephemeral — resets on
+  // reload, since a recurring recipe shouldn't stay half-checked.
+  const [checklist, setChecklist] = useState(false);
+  const [checked, setChecked] = useState<ReadonlySet<string>>(() => new Set());
   const factor = servings / recipe.baseServings;
+  const steps = splitSteps(recipe.method);
+  const total = recipe.ingredients.length + steps.length;
+
+  const toggle = (key: string) =>
+    setChecked((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
 
   return (
     <div className="rounded-card border border-hairline bg-surface">
@@ -109,6 +131,25 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
 
       {open ? (
         <div className="flex flex-col gap-4 border-t border-hairline p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <button
+              type="button"
+              aria-pressed={checklist}
+              onClick={() => setChecklist((value) => !value)}
+              className={`inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-1 text-xs transition-colors ${
+                checklist ? "border-accent text-accent" : "border-hairline text-muted hover:text-fg"
+              }`}
+            >
+              <ListChecks className="size-3.5" aria-hidden /> Checklist
+            </button>
+            {checklist && total > 0 ? (
+              <span className="text-xs text-faint">
+                <span className="nums">{checked.size}</span>/<span className="nums">{total}</span>{" "}
+                done
+              </span>
+            ) : null}
+          </div>
+
           {recipe.ingredients.length > 0 ? (
             <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -121,14 +162,52 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
                   onChange={setServings}
                 />
               </div>
-              <IngredientList ingredients={recipe.ingredients} factor={factor} />
+              <IngredientList
+                ingredients={recipe.ingredients}
+                factor={factor}
+                checklist={checklist}
+                checked={checked}
+                onToggle={toggle}
+              />
             </div>
           ) : null}
-          {recipe.method ? <Section title="Method" body={recipe.method} /> : null}
+
+          {steps.length > 0 ? (
+            <MethodList steps={steps} checklist={checklist} checked={checked} onToggle={toggle} />
+          ) : null}
+
           {recipe.notes ? <Section title="Notes" body={recipe.notes} /> : null}
         </div>
       ) : null}
     </div>
+  );
+}
+
+function CheckButton({
+  checked,
+  onClick,
+  label,
+}: {
+  checked: boolean;
+  onClick: () => void;
+  label: string;
+}) {
+  return (
+    // biome-ignore lint/a11y/useSemanticElements: custom-styled toggle; a native checkbox can't carry the HUD styling.
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={onClick}
+      className={`mt-0.5 grid size-4 shrink-0 place-items-center rounded-[5px] border transition-colors ${
+        checked
+          ? "border-accent bg-accent text-accent-fg"
+          : "border-hairline text-transparent hover:border-accent"
+      }`}
+    >
+      <Check className="size-3" aria-hidden />
+    </button>
   );
 }
 
@@ -176,19 +255,25 @@ function ServingsStepper({
 function IngredientList({
   ingredients,
   factor,
+  checklist,
+  checked,
+  onToggle,
 }: {
   ingredients: RecipeIngredient[];
   factor: number;
+  checklist: boolean;
+  checked: ReadonlySet<string>;
+  onToggle: (key: string) => void;
 }) {
-  const groups = new Map<string, RecipeIngredient[]>();
+  const groups = new Map<string, { ingredient: RecipeIngredient; index: number }[]>();
   const order: string[] = [];
-  for (const ingredient of ingredients) {
+  ingredients.forEach((ingredient, index) => {
     if (!groups.has(ingredient.section)) {
       groups.set(ingredient.section, []);
       order.push(ingredient.section);
     }
-    groups.get(ingredient.section)?.push(ingredient);
-  }
+    groups.get(ingredient.section)?.push({ ingredient, index });
+  });
 
   return (
     <div className="flex flex-col gap-3">
@@ -196,23 +281,75 @@ function IngredientList({
         <div key={section || "default"}>
           {section ? <p className="mb-1 text-xs font-medium text-faint">{section}</p> : null}
           <ul className="flex flex-col gap-1 text-sm">
-            {(groups.get(section) ?? []).map((ingredient, index) => (
-              <li
-                key={`${ingredient.name}-${index}`}
-                className="flex items-baseline justify-between gap-3"
-              >
-                <span className="min-w-0 text-muted">
-                  {ingredient.name}
-                  {ingredient.note ? (
-                    <span className="text-faint"> ({ingredient.note})</span>
-                  ) : null}
-                </span>
-                <span className="nums shrink-0 text-fg">{formatAmount(ingredient, factor)}</span>
-              </li>
-            ))}
+            {(groups.get(section) ?? []).map(({ ingredient, index }) => {
+              const key = `ing-${index}`;
+              const isChecked = checklist && checked.has(key);
+              return (
+                <li key={key} className="flex items-start justify-between gap-3">
+                  <span className="flex min-w-0 items-start gap-2">
+                    {checklist ? (
+                      <CheckButton
+                        checked={checked.has(key)}
+                        onClick={() => onToggle(key)}
+                        label={ingredient.name}
+                      />
+                    ) : null}
+                    <span
+                      className={`min-w-0 ${isChecked ? "text-faint line-through" : "text-muted"}`}
+                    >
+                      {ingredient.name}
+                      {ingredient.note ? (
+                        <span className="text-faint"> ({ingredient.note})</span>
+                      ) : null}
+                    </span>
+                  </span>
+                  <span
+                    className={`nums shrink-0 ${isChecked ? "text-faint line-through" : "text-fg"}`}
+                  >
+                    {formatAmount(ingredient, factor)}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         </div>
       ))}
+    </div>
+  );
+}
+
+function MethodList({
+  steps,
+  checklist,
+  checked,
+  onToggle,
+}: {
+  steps: string[];
+  checklist: boolean;
+  checked: ReadonlySet<string>;
+  onToggle: (key: string) => void;
+}) {
+  return (
+    <div>
+      <h3 className="mb-1 text-xs font-medium uppercase tracking-wide text-faint">Method</h3>
+      <ol className="flex flex-col gap-1.5 text-sm">
+        {steps.map((step, index) => {
+          const key = `step-${index}`;
+          const isChecked = checklist && checked.has(key);
+          return (
+            <li key={key} className="flex items-start gap-2">
+              {checklist ? (
+                <CheckButton
+                  checked={checked.has(key)}
+                  onClick={() => onToggle(key)}
+                  label={step}
+                />
+              ) : null}
+              <span className={isChecked ? "text-faint line-through" : "text-muted"}>{step}</span>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

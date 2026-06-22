@@ -49,11 +49,14 @@ export function RootShell(): ReactNode {
     // HTML tag nesting" variant. Suppress on this element only — it doesn't
     // cascade into children, so real hydration bugs deeper in the tree still
     // throw normally.
-    <html lang="en" suppressHydrationWarning>
+    // Inline critical styles on <html>/<body> so the FIRST paint is the dark
+    // theme — before the external stylesheet (prod) or Vite's JS-injected styles
+    // (dev) load. Without this the initial paint flashes white/unstyled.
+    <html lang="en" suppressHydrationWarning style={{ background: "#08080a", colorScheme: "dark" }}>
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body style={{ margin: 0, background: "#08080a", color: "#f4f4f5" }}>
         <Provider>
           <Suspense fallback={null}>
             <HydrateThenRender>
