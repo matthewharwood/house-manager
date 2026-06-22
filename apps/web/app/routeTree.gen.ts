@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PetsRouteImport } from './routes/pets'
+import { Route as PeopleRouteImport } from './routes/people'
 import { Route as MealsRouteImport } from './routes/meals'
 import { Route as KidsRouteImport } from './routes/kids'
 import { Route as HiringRouteImport } from './routes/hiring'
@@ -21,6 +22,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const PetsRoute = PetsRouteImport.update({
   id: '/pets',
   path: '/pets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PeopleRoute = PeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MealsRoute = MealsRouteImport.update({
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/hiring': typeof HiringRoute
   '/kids': typeof KidsRoute
   '/meals': typeof MealsRoute
+  '/people': typeof PeopleRoute
   '/pets': typeof PetsRoute
 }
 export interface FileRoutesByTo {
@@ -77,6 +84,7 @@ export interface FileRoutesByTo {
   '/hiring': typeof HiringRoute
   '/kids': typeof KidsRoute
   '/meals': typeof MealsRoute
+  '/people': typeof PeopleRoute
   '/pets': typeof PetsRoute
 }
 export interface FileRoutesById {
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   '/hiring': typeof HiringRoute
   '/kids': typeof KidsRoute
   '/meals': typeof MealsRoute
+  '/people': typeof PeopleRoute
   '/pets': typeof PetsRoute
 }
 export interface FileRouteTypes {
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
     | '/hiring'
     | '/kids'
     | '/meals'
+    | '/people'
     | '/pets'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/hiring'
     | '/kids'
     | '/meals'
+    | '/people'
     | '/pets'
   id:
     | '__root__'
@@ -120,6 +131,7 @@ export interface FileRouteTypes {
     | '/hiring'
     | '/kids'
     | '/meals'
+    | '/people'
     | '/pets'
   fileRoutesById: FileRoutesById
 }
@@ -131,6 +143,7 @@ export interface RootRouteChildren {
   HiringRoute: typeof HiringRoute
   KidsRoute: typeof KidsRoute
   MealsRoute: typeof MealsRoute
+  PeopleRoute: typeof PeopleRoute
   PetsRoute: typeof PetsRoute
 }
 
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/pets'
       fullPath: '/pets'
       preLoaderRoute: typeof PetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/people': {
+      id: '/people'
+      path: '/people'
+      fullPath: '/people'
+      preLoaderRoute: typeof PeopleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/meals': {
@@ -203,6 +223,7 @@ const rootRouteChildren: RootRouteChildren = {
   HiringRoute: HiringRoute,
   KidsRoute: KidsRoute,
   MealsRoute: MealsRoute,
+  PeopleRoute: PeopleRoute,
   PetsRoute: PetsRoute,
 }
 export const routeTree = rootRouteImport

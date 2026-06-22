@@ -2,7 +2,7 @@ import type { Progress, Settings } from "@house-manager/schemas";
 import { type DBSchema, type IDBPDatabase, openDB } from "idb";
 
 import type { EntityRecord } from "./entity-schema";
-import { SEED_RECIPES } from "./seed-data";
+import { SEED_PEOPLE, SEED_RECIPES } from "./seed-data";
 import {
   type Namespace,
   type Org,
@@ -25,7 +25,7 @@ export interface AppDB extends DBSchema {
 // keyed by origin, so a bare "web" would collide whenever two house-manager
 // apps are served from the same origin (e.g. localhost:5173 across repos/apps).
 const DB_NAME = "@house-manager/web";
-const DB_VERSION = 8;
+const DB_VERSION = 9;
 
 let dbPromise: Promise<IDBPDatabase<AppDB>> | undefined;
 let closed = false;
@@ -83,6 +83,13 @@ export function getDB(): Promise<IDBPDatabase<AppDB>> {
         // Chia pudding gained a researched "Toppers" section (ground flax, hemp
         // hearts, goji, shredded dark chocolate, granola). Re-seed to overwrite.
         const entities = transaction.objectStore("entities");
+        for (const recipe of SEED_RECIPES) void entities.put(recipe);
+      }
+      if (oldVersion < 9) {
+        // People become first-class entities (RULES.md §12), referenced by id.
+        // Seed the family + re-seed recipes whose forWho now holds person ids.
+        const entities = transaction.objectStore("entities");
+        for (const person of SEED_PEOPLE) void entities.put(person);
         for (const recipe of SEED_RECIPES) void entities.put(recipe);
       }
     },

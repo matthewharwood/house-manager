@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { SelectField, TextArea, TextField } from "~/components/ui/field";
 import { Modal } from "~/components/ui/modal";
+import { indexById, type Person, people } from "~/features/people/data";
 
 import {
   MEAL_TYPE_LABELS,
@@ -36,6 +37,8 @@ function splitSteps(method: string): string[] {
 // Meals as a recipe library, categorized by meal type (RULES.md §6).
 export function MealsPage() {
   const all = useAtomValue(recipes.listAtom);
+  const allPeople = useAtomValue(people.listAtom);
+  const peopleById = indexById(allPeople);
   const [adding, setAdding] = useState(false);
 
   return (
@@ -66,7 +69,7 @@ export function MealsPage() {
               <ul className="flex flex-col gap-2">
                 {items.map((recipe) => (
                   <li key={recipe.id}>
-                    <RecipeCard recipe={recipe} />
+                    <RecipeCard recipe={recipe} peopleById={peopleById} />
                   </li>
                 ))}
               </ul>
@@ -75,12 +78,17 @@ export function MealsPage() {
         })
       )}
 
-      {adding ? <RecipeModal onClose={() => setAdding(false)} /> : null}
+      {adding ? (
+        <RecipeModal
+          onClose={() => setAdding(false)}
+          peopleList={allPeople.filter((person) => !person.archived)}
+        />
+      ) : null}
     </div>
   );
 }
 
-function RecipeCard({ recipe }: { recipe: Recipe }) {
+function RecipeCard({ recipe, peopleById }: { recipe: Recipe; peopleById: Map<string, Person> }) {
   const [open, setOpen] = useState(false);
   const [servings, setServings] = useState(recipe.baseServings);
   // Opt-in "cook mode": off by default so the read view stays clean; on, it
@@ -116,9 +124,9 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
                 {recipe.cadence}
               </span>
             ) : null}
-            {recipe.forWho.map((person) => (
-              <span key={person} className="rounded-pill bg-raised px-2 py-0.5 text-muted">
-                {person}
+            {recipe.forWho.map((id) => (
+              <span key={id} className="rounded-pill bg-raised px-2 py-0.5 text-muted">
+                {peopleById.get(id)?.name ?? id}
               </span>
             ))}
           </div>
@@ -356,17 +364,22 @@ function Section({ title, body }: { title: string; body: string }) {
   );
 }
 
-function RecipeModal({ onClose }: { onClose: () => void }) {
+function RecipeModal({ onClose, peopleList }: { onClose: () => void; peopleList: Person[] }) {
   const upsert = useSetAtom(recipes.upsertAtom);
   const [draft, setDraft] = useState({
     title: "",
     mealType: "breakfast",
     cadence: "",
-    forWho: "",
     ingredients: "",
     method: "",
     notes: "",
   });
+  // forWho holds person IDs (a reference, not free text) — toggled below.
+  const [forWho, setForWho] = useState<string[]>([]);
+  const toggleForWho = (id: string) =>
+    setForWho((current) =>
+      current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
+    );
   const set = (key: keyof typeof draft) => (value: string) =>
     setDraft((current) => ({ ...current, [key]: value }));
   const canSave = draft.title.trim().length > 0;
@@ -390,10 +403,7 @@ function RecipeModal({ onClose }: { onClose: () => void }) {
                 title: draft.title.trim(),
                 mealType: draft.mealType as Recipe["mealType"],
                 cadence: draft.cadence.trim(),
-                forWho: draft.forWho
-                  .split(",")
-                  .map((name) => name.trim())
-                  .filter(Boolean),
+                forWho,
                 ingredients: draft.ingredients
                   .split("\n")
                   .map(parseIngredientLine)
@@ -430,12 +440,33 @@ function RecipeModal({ onClose }: { onClose: () => void }) {
             placeholder="e.g. Biweekly"
           />
         </div>
-        <TextField
-          label="For who (comma-separated)"
-          value={draft.forWho}
-          onChange={set("forWho")}
-          placeholder="Wife"
-        />
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs font-medium text-muted">For who</span>
+          {peopleList.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {peopleList.map((person) => {
+                const on = forWho.includes(person.id);
+                return (
+                  <button
+                    key={person.id}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => toggleForWho(person.id)}
+                    className={`rounded-pill border px-3 py-1 text-xs transition-colors ${
+                      on
+                        ? "border-accent bg-accent/15 text-accent"
+                        : "border-hairline text-muted hover:text-fg"
+                    }`}
+                  >
+                    {person.name}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-xs text-faint">Add people on the People screen first.</p>
+          )}
+        </div>
         <TextArea
           label="Ingredients (one per line, e.g. “100g cooked rice”)"
           value={draft.ingredients}

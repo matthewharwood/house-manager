@@ -14,7 +14,7 @@ export const SEED_RECIPES: EntityRecord[] = [
     mealType: "breakfast",
     cadence: "Biweekly",
     baseServings: 1,
-    forWho: ["Matthew", "Daisy"],
+    forWho: ["person-matthew", "person-daisy"],
     ingredients: [
       { name: "Chia seeds", amount: 4, unit: "tbsp", section: "", note: "" },
       { name: "Rolled oats", amount: 3, unit: "tbsp", section: "", note: "" },
@@ -78,7 +78,7 @@ export const SEED_RECIPES: EntityRecord[] = [
     mealType: "breakfast",
     cadence: "",
     baseServings: 1,
-    forWho: ["Wife"],
+    forWho: ["person-daisy"],
     ingredients: [
       {
         name: "Cooked wild rice / purple mixed rice",
@@ -116,5 +116,62 @@ export const SEED_RECIPES: EntityRecord[] = [
     notes: [
       "Base recipe is one serving — use the Days counter (1–7) to batch a few days at once.",
     ].join("\n"),
+  } as EntityRecord,
+];
+
+// The household — first-class people referenced by id from recipes/chores
+// (see PersonSchema). Daisy is the wife/mom, Matthew the dad, Dean & Ava the kids.
+export const SEED_PEOPLE: EntityRecord[] = [
+  {
+    id: "person-daisy",
+    type: "person",
+    namespaceId: "ns-main",
+    createdAt: "2026-06-21T08:00:00.000Z",
+    updatedAt: "2026-06-21T08:00:00.000Z",
+    name: "Daisy",
+    role: "Mom",
+    aliases: [],
+    birthday: "1984-02-27",
+    tags: ["family"],
+    archived: false,
+  } as EntityRecord,
+  {
+    id: "person-matthew",
+    type: "person",
+    namespaceId: "ns-main",
+    createdAt: "2026-06-21T08:00:00.000Z",
+    updatedAt: "2026-06-21T08:00:00.000Z",
+    name: "Matthew",
+    role: "Dad",
+    aliases: [],
+    birthday: "1985-09-03",
+    tags: ["family"],
+    archived: false,
+  } as EntityRecord,
+  {
+    id: "person-dean",
+    type: "person",
+    namespaceId: "ns-main",
+    createdAt: "2026-06-21T08:00:00.000Z",
+    updatedAt: "2026-06-21T08:00:00.000Z",
+    name: "Dean",
+    role: "Son",
+    aliases: [],
+    birthday: "2018-02-28",
+    tags: ["family"],
+    archived: false,
+  } as EntityRecord,
+  {
+    id: "person-ava",
+    type: "person",
+    namespaceId: "ns-main",
+    createdAt: "2026-06-21T08:00:00.000Z",
+    updatedAt: "2026-06-21T08:00:00.000Z",
+    name: "Ava",
+    role: "Daughter",
+    aliases: [],
+    birthday: "2024-12-12",
+    tags: ["family"],
+    archived: false,
   } as EntityRecord,
 ];

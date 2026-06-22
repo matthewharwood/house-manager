@@ -7,6 +7,7 @@ import {
   Sparkles,
   Stethoscope,
   Sun,
+  Users,
   UtensilsCrossed,
 } from "lucide-react";
 
@@ -30,6 +31,7 @@ export const NAV_ITEMS = [
   { id: "kids", label: "Kids", href: "/kids", icon: Baby },
   { id: "appointments", label: "Appointments", href: "/appointments", icon: Stethoscope },
   { id: "hiring", label: "Hiring", href: "/hiring", icon: Briefcase },
+  { id: "people", label: "People", href: "/people", icon: Users },
 ] as const satisfies readonly NavItem[];
 
 // The 4 thumb-reachable destinations on the mobile bottom tab bar; a 5th "More"

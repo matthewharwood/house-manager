@@ -349,7 +349,7 @@ Recreate, in our stack, the source's shell:
 - **Recreate in TanStack Start:** the persistent shell lives in the root route
   (`app/routes/__root.tsx`) wrapping `<Outlet />`; rail/drawer state in a small
   store (Jotai). No need to port the source's "Ask" AI panel unless we want one
-  later (§12). — [Decided]
+  later (§13). — [Decided]
 
 ### 11.4 Out of scope to copy
 - The source's invoicing/timesheet/payments features and its "Ask" Claude panel —
@@ -387,7 +387,38 @@ workspace-switcher patterns; WAI-ARIA APG — Dialog (Modal).
 
 ---
 
-## 12. Explicitly deferred — but the seams exist now
+## 12. Data model — entities & references — [Decided / Implemented]
+
+Every domain object is a **typed entity** in one IndexedDB `entities` store, sliced
+by `defineCollection(type, ZodSchema)` (→ `listAtom` / `upsertAtom` / `removeAtom`).
+The **Zod schema is the single source of truth**; the TS type is `z.infer` of it; IDB
+is the store and Jotai the in-memory cache (CLAUDE.md Pillars 2–3). New entity types
+reuse the store — no migration beyond a seed. "Statically typed, amend later, update
+in batch" = exactly this.
+
+**Reference by id, never by copy.** When one entity points at another it stores the
+**id**, resolved to a display value at the edge. Edit the target once and every
+reference updates — no denormalized copies to chase. (E.g. `Recipe.forWho` holds
+`Person` ids; the card resolves `id → Person.name`, falling back to the raw value for
+legacy strings.)
+
+A section per part of the app:
+- **`person`** (People) — the household's source of truth. `{ name, role, aliases[],
+  birthday, tags[], archived }`. **Archived, never deleted** (people don't get
+  removed). `tags` is a flexible list — seeded `family`, plus `household-team` for
+  sitters / helpers / guests. Seeded: Daisy (Mom), Matthew (Dad), Dean (Son), Ava
+  (Daughter). Namespace-scoped today; **org-scoping is the next seam** (a family
+  spans a household's namespaces). — [Implemented]
+- **`recipe`** (Meals) — `{ title, mealType, cadence, baseServings, forWho[]→person,
+  ingredients[], method, notes }`. `forWho` references people by id. — [Implemented]
+- **`task`** (Chores / Pets / Kids / Appointments) — `{ area, title, cadence, weekday,
+  dueDate, rotation[], completions }`. `rotation` is still free strings; **next: point
+  it at `person` ids** like `forWho`. — [Implemented / partial]
+- **`candidate`**, **`jobPosting`** (Hiring) — the ATS entities (§8). — [Implemented]
+
+---
+
+## 13. Explicitly deferred — but the seams exist now
 
 Not built yet; each must be reachable **without reshaping data**:
 - Auth / login / accounts. (Seam: active-id indirection, §4.) — [Deferred]
@@ -403,7 +434,7 @@ Not built yet; each must be reachable **without reshaping data**:
 
 ---
 
-## 13. Open questions (resolve as you append)
+## 14. Open questions (resolve as you append)
 
 1. **Tenant entity name** — keep `HouseManager`, or rename to `Household`/`Account`
    to disambiguate from the hired *house-manager role* (§3.2)? (§4)

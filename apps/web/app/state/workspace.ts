@@ -106,7 +106,7 @@ export const setActiveOrgAtom = atom(null, (get, set, orgId: string) => {
   }));
 });
 
-// --- CRUD (RULES.md §13 open question resolved: seed-only → editable) ---
+// --- CRUD (RULES.md §14 open question resolved: seed-only → editable) ---
 
 /** Create a namespace in the active org and switch to it. */
 export const createNamespaceAtom = atom(null, (get, set, name: string) => {
