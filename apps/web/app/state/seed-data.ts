@@ -52,7 +52,7 @@ export const SEED_RECIPES: EntityRecord[] = [
     updatedAt: "2026-06-21T08:05:00.000Z",
     title: "Kimchi Dill Egg Breakfast Bowl",
     mealType: "breakfast",
-    cadence: "Every 3 days",
+    cadence: "",
     baseServings: 1,
     forWho: ["Wife"],
     ingredients: [
@@ -90,8 +90,7 @@ export const SEED_RECIPES: EntityRecord[] = [
       "8. Finish with 5g olive oil.",
     ].join("\n"),
     notes: [
-      "Cooking cadence: every 3 days.",
-      "Base recipe is one serving — use the servings counter to scale the ingredient amounts.",
+      "Base recipe is one serving — use the Days counter (1–7) to batch a few days at once.",
     ].join("\n"),
   } as EntityRecord,
 ];

@@ -156,11 +156,7 @@ function RecipeCard({ recipe }: { recipe: Recipe }) {
                 <h3 className="text-xs font-medium uppercase tracking-wide text-faint">
                   Ingredients
                 </h3>
-                <ServingsStepper
-                  value={servings}
-                  base={recipe.baseServings}
-                  onChange={setServings}
-                />
+                <ServingsStepper value={servings} onChange={setServings} />
               </div>
               <IngredientList
                 ingredients={recipe.ingredients}
@@ -211,22 +207,23 @@ function CheckButton({
   );
 }
 
+// "Days" of servings — recipes are one serving (one day); batch 1–7 days at once.
+const MAX_DAYS = 7;
+
 function ServingsStepper({
   value,
-  base,
   onChange,
 }: {
   value: number;
-  base: number;
   onChange: (value: number) => void;
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-muted">Servings</span>
+      <span className="text-xs text-muted">Days</span>
       <div className="inline-flex items-center rounded-button border border-hairline">
         <button
           type="button"
-          aria-label="Fewer servings"
+          aria-label="Fewer days"
           disabled={value <= 1}
           onClick={() => onChange(Math.max(1, value - 1))}
           className="grid size-8 place-items-center text-muted transition-colors hover:text-fg disabled:opacity-30"
@@ -236,18 +233,14 @@ function ServingsStepper({
         <span className="nums w-7 text-center text-sm text-fg">{value}</span>
         <button
           type="button"
-          aria-label="More servings"
-          onClick={() => onChange(value + 1)}
-          className="grid size-8 place-items-center text-muted transition-colors hover:text-fg"
+          aria-label="More days"
+          disabled={value >= MAX_DAYS}
+          onClick={() => onChange(Math.min(MAX_DAYS, value + 1))}
+          className="grid size-8 place-items-center text-muted transition-colors hover:text-fg disabled:opacity-30"
         >
           <Plus className="size-4" aria-hidden />
         </button>
       </div>
-      {value !== base ? (
-        <span className="text-xs text-faint">
-          ×{Math.round((value / base) * 100) / 100} of {base}
-        </span>
-      ) : null}
     </div>
   );
 }
@@ -369,7 +362,6 @@ function RecipeModal({ onClose }: { onClose: () => void }) {
     title: "",
     mealType: "breakfast",
     cadence: "",
-    baseServings: "1",
     forWho: "",
     ingredients: "",
     method: "",
@@ -398,7 +390,6 @@ function RecipeModal({ onClose }: { onClose: () => void }) {
                 title: draft.title.trim(),
                 mealType: draft.mealType as Recipe["mealType"],
                 cadence: draft.cadence.trim(),
-                baseServings: Math.max(1, Math.round(Number(draft.baseServings) || 1)),
                 forWho: draft.forWho
                   .split(",")
                   .map((name) => name.trim())
@@ -425,7 +416,7 @@ function RecipeModal({ onClose }: { onClose: () => void }) {
           onChange={set("title")}
           placeholder="Kimchi dill egg bowl"
         />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <SelectField
             label="Meal"
             value={draft.mealType}
@@ -433,16 +424,10 @@ function RecipeModal({ onClose }: { onClose: () => void }) {
             options={MEAL_TYPES}
           />
           <TextField
-            label="Cadence"
+            label="Cadence (optional)"
             value={draft.cadence}
             onChange={set("cadence")}
-            placeholder="Every 3 days"
-          />
-          <TextField
-            label="Base servings"
-            type="number"
-            value={draft.baseServings}
-            onChange={set("baseServings")}
+            placeholder="e.g. Biweekly"
           />
         </div>
         <TextField
