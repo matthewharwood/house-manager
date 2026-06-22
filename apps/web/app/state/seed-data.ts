@@ -24,6 +24,29 @@ export const SEED_RECIPES: EntityRecord[] = [
       { name: "Cinnamon", amount: 0.25, unit: "tsp", section: "", note: "¼–½" },
       { name: "Vanilla extract", amount: 0.5, unit: "tsp", section: "", note: "" },
       { name: "Salt", amount: 0, unit: "", section: "", note: "tiny pinch" },
+      {
+        name: "Ground flaxseed",
+        amount: 1,
+        unit: "tbsp",
+        section: "Toppers",
+        note: "≈7 g · ground, not whole — whole passes through undigested",
+      },
+      { name: "Hemp hearts", amount: 1, unit: "tbsp", section: "Toppers", note: "≈10 g" },
+      { name: "Goji berries", amount: 1, unit: "tbsp", section: "Toppers", note: "≈6 g · dried" },
+      {
+        name: "Shredded dark chocolate",
+        amount: 1,
+        unit: "tbsp",
+        section: "Toppers",
+        note: "≈6 g · Montezuma Black 100% — intense, start at 1 tsp",
+      },
+      {
+        name: "Granola",
+        amount: 1,
+        unit: "tbsp",
+        section: "Toppers",
+        note: "≈7 g · just a little, for crunch",
+      },
     ],
     method: [
       "1. In your jar, add coconut milk, regular milk, honey, cinnamon, vanilla, and salt.",
@@ -33,6 +56,7 @@ export const SEED_RECIPES: EntityRecord[] = [
       "5. Wait 5–10 minutes, then stir again so the chia doesn't clump.",
       "6. Refrigerate at least 2 hours, ideally overnight.",
       "7. Before eating, stir again. If it's too thick, add a splash of regular milk.",
+      "8. Top with the ground flaxseed, hemp hearts, goji berries, and shredded dark chocolate. Add the granola last, right before eating, so it stays crunchy.",
     ].join("\n"),
     notes: [
       "Kids won't eat it — this one's for Matthew & Daisy.",

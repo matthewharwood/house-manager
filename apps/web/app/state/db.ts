@@ -25,7 +25,7 @@ export interface AppDB extends DBSchema {
 // keyed by origin, so a bare "web" would collide whenever two house-manager
 // apps are served from the same origin (e.g. localhost:5173 across repos/apps).
 const DB_NAME = "@house-manager/web";
-const DB_VERSION = 7;
+const DB_VERSION = 8;
 
 let dbPromise: Promise<IDBPDatabase<AppDB>> | undefined;
 let closed = false;
@@ -76,6 +76,12 @@ export function getDB(): Promise<IDBPDatabase<AppDB>> {
       if (oldVersion < 7) {
         // Dropped the per-recipe "Every 3 days" cadence — batching is the 1–7
         // "Days" counter now. Re-seed to overwrite the v6 versions.
+        const entities = transaction.objectStore("entities");
+        for (const recipe of SEED_RECIPES) void entities.put(recipe);
+      }
+      if (oldVersion < 8) {
+        // Chia pudding gained a researched "Toppers" section (ground flax, hemp
+        // hearts, goji, shredded dark chocolate, granola). Re-seed to overwrite.
         const entities = transaction.objectStore("entities");
         for (const recipe of SEED_RECIPES) void entities.put(recipe);
       }
