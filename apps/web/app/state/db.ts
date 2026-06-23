@@ -2,7 +2,7 @@ import type { Progress, Settings } from "@house-manager/schemas";
 import { type DBSchema, type IDBPDatabase, openDB } from "idb";
 
 import type { EntityRecord } from "./entity-schema";
-import { SEED_PEOPLE, SEED_RECIPES } from "./seed-data";
+import { SEED_PEOPLE, SEED_POSTINGS, SEED_RECIPES } from "./seed-data";
 import {
   type Namespace,
   type Org,
@@ -25,7 +25,7 @@ export interface AppDB extends DBSchema {
 // keyed by origin, so a bare "web" would collide whenever two house-manager
 // apps are served from the same origin (e.g. localhost:5173 across repos/apps).
 const DB_NAME = "@house-manager/web";
-const DB_VERSION = 9;
+const DB_VERSION = 10;
 
 let dbPromise: Promise<IDBPDatabase<AppDB>> | undefined;
 let closed = false;
@@ -91,6 +91,11 @@ export function getDB(): Promise<IDBPDatabase<AppDB>> {
         const entities = transaction.objectStore("entities");
         for (const person of SEED_PEOPLE) void entities.put(person);
         for (const recipe of SEED_RECIPES) void entities.put(recipe);
+      }
+      if (oldVersion < 10) {
+        // Seed the open "Household & Family Operations Manager" req into the ATS.
+        const entities = transaction.objectStore("entities");
+        for (const posting of SEED_POSTINGS) void entities.put(posting);
       }
     },
     blocked() {
